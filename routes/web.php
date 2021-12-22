@@ -8,5 +8,6 @@ Route::get('/', function () {
 });
 
 Route::prefix('query')->group(function() {
-    Route::get('posts/{role_name?}', [TipQueryEloquentController::class, 'getPostOfEditor']);
+    Route::get('posts/{role_name?}', [TipQueryEloquentController::class, 'getPostByUserHasRole'])
+        ->name('posts.role');
 });
