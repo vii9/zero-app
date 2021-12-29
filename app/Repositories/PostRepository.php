@@ -42,6 +42,11 @@ class PostRepository implements PostRepositoryInterface
 
         return $posts;
     }
+
+    public function getPostById($id)
+    {
+        return $this->_postModel->find($id);
+    }
 }
 
 /* sql explain query
