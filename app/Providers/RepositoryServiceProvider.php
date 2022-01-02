@@ -7,6 +7,9 @@ use App\Repositories\PostRepository;
 use App\Repositories\PostRepositoryInterface;
 use App\Repositories\ProductApiRepository;
 use App\Repositories\ProductApiRepositoryInterface;
+use App\Repositories\UserApiRepository;
+use App\Repositories\UserApiRepositoryInterface;
+
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -19,6 +22,7 @@ class RepositoryServiceProvider extends ServiceProvider
     {
         $this->app->bind(PostRepositoryInterface::class, PostRepository::class);
         $this->app->bind(ProductApiRepositoryInterface::class, ProductApiRepository::class);
+        $this->app->bind(UserApiRepositoryInterface::class, UserApiRepository::class);
     }
 
     /**

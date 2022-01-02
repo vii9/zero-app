@@ -1,8 +1,9 @@
 <?php
 
-use Illuminate\Http\Request;
+//use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\AuthSanctumController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,11 +16,19 @@ use App\Http\Controllers\Api\ProductController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+//Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+//    return $request->user();
+//});
 
-Route::prefix('products')->as('api.')->group(function() {
+Route::post('auth/user/register', [AuthSanctumController::class, 'register'])->name('auth.user.register');
+Route::post('auth/user/login', [AuthSanctumController::class, 'login'])->name('auth.user.login');
+
+Route::post('auth/user/logout', [AuthSanctumController::class, 'logout'])->name('auth.user.logout')
+    ->middleware('auth:sanctum');
+
+
+
+Route::prefix('products')->middleware('auth:sanctum')->as('api.')->group(function() {
     Route::get('/', [ProductController::class, 'index'])->name('products.index');
     Route::get('/{id_product}', [ProductController::class, 'show'])->name('products.show');
     Route::post('/add', [ProductController::class, 'store'])->name('products.store');
