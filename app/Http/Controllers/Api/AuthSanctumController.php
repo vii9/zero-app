@@ -35,9 +35,7 @@ class AuthSanctumController extends Controller
         $validator = $this->_validateUserCreate($request->all());
 
         if ($validator->fails()) {
-            return response()->json([
-                'app_message' => 'ERROR', 'data' => $validator->getMessageBag()
-            ], ApiStatus::VALIDATE_ERROR);
+            return apiError(ApiStatus::VALIDATE_ERROR, $validator->getMessageBag());
         }
 
         try {
@@ -45,19 +43,11 @@ class AuthSanctumController extends Controller
 
             $userToken = $user->createToken('u_token')->plainTextToken;
 
-            return response()->json([
-                'app_message' => 'SUCCESS',
-                'data' => [
-                    'user' => $user,
-                    'user_token' => $userToken
-                ]
-            ], ApiStatus::CREATED);
+            return apiSuccess(['user' => $user, 'user_token' => $userToken], 'user created! oke', ApiStatus::CREATED);
         } catch (\Exception $e) {
             logger($e->getMessage());
 
-            return response()->json([
-                'app_message' => 'ERROR', 'data' => 'Can not create user'
-            ], ApiStatus::SERVER_ERROR);
+            return apiError(ApiStatus::SERVER_ERROR, 'can not create user!');
         }
     }
 
@@ -77,35 +67,23 @@ class AuthSanctumController extends Controller
         $validator = $this->_validateUserLogin($request->all());
 
         if ($validator->fails()) {
-            return response()->json([
-                'app_message' => 'ERROR', 'data' => $validator->getMessageBag()
-            ], ApiStatus::VALIDATE_ERROR);
+            return apiError(ApiStatus::VALIDATE_ERROR, $validator->getMessageBag());
         }
 
         try {
             $user = $this->_userRepo->getUserByEmail($request->email);
 
             if (! $user or ! Hash::check($request->password, $user->password)) {
-                return response()->json([
-                    'app_message' => 'ERROR', 'data' => 'email or password invalid!'
-                ], ApiStatus::CREDENTIAL_ERROR);
+                return apiError(ApiStatus::CREDENTIAL_ERROR, 'email or password invalid!');
             }
 
             $userToken = $user->createToken('u_token')->plainTextToken;
 
-            return response()->json([
-                'app_message' => 'SUCCESS',
-                'data' => [
-                    'user' => $user,
-                    'user_token' => $userToken
-                ]
-            ], ApiStatus::CREATED);
+            return apiSuccess(['user' => $user, 'user_token' => $userToken], 'Login successfully!');
         } catch (\Exception $e) {
             logger($e->getMessage());
 
-            return response()->json([
-                'app_message' => 'ERROR', 'data' => 'Can not create user'
-            ], ApiStatus::SERVER_ERROR);
+            return apiError(ApiStatus::SERVER_ERROR, 'Login fails');
         }
     }
 
@@ -123,20 +101,17 @@ class AuthSanctumController extends Controller
         $_user_id = (int) auth()->user()->tokens()->pluck('tokenable_id')[0];
 
         if ($user_id !== $_user_id) {
-            return response()->json(['app_message' => 'ERROR', 'data' => 'Can not logout: Token Invalid!'], ApiStatus::SERVER_ERROR);
+            return apiError(ApiStatus::SERVER_ERROR, 'Can not logout: Token Invalid!');
         }
 
         try {
             auth()->user()->tokens()->delete();
 
-            return response()->json([
-                'app_message' => 'SUCCESS',
-                'data' => ['user_token' => 'Logout successfully!']
-            ]);
+            return apiSuccess([], 'Logout successfully!');
         } catch (\Exception $e) {
             logger($e->getMessage());
 
-            return response()->json(['app_message' => 'ERROR', 'data' => 'Can not logout: Token Invalid'], ApiStatus::SERVER_ERROR);
+            return apiError(ApiStatus::SERVER_ERROR, 'Can not logout: Token Invalid');
         }
     }
 }

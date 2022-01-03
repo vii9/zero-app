@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Constant\ApiStatus;
 use App\Http\Controllers\Controller;
 use App\Repositories\ProductApiRepositoryInterface;
 use Illuminate\Http\Request;
@@ -26,11 +27,9 @@ class ProductController extends Controller
     {
         $products = $this->_productRepo->getAll();
 
-        if ( ! $products) {
-            return response()->json(['message' => 'ERROR'], 500);
-        }
-
-        return response()->json(['message' => 'SUCCESS', 'data' => $products]);
+        return ! $products
+            ? apiError(ApiStatus::SERVER_ERROR)
+            : apiSuccess($products, 'all products');
     }
 
     /**
@@ -44,18 +43,17 @@ class ProductController extends Controller
         $validator = $this->_validateProductCreate($request->all());
 
         if ($validator->fails()) {
-            return response()->json(['message' => 'ERROR', 'data' => $validator->getMessageBag()], 403);
+            return apiError(ApiStatus::VALIDATE_ERROR, $validator->getMessageBag());
         }
 
         try {
             $newProduct = $this->_productRepo->create($request->all());
 
-            return response()->json(['message' => 'SUCCESS', 'data' => $newProduct], 201);
-
+            return apiSuccess($newProduct,'Product create successfully',201);
         } catch (\Exception $e) {
             logger($e->getMessage());
 
-            return response()->json(['message' => 'ERROR', 'data' => 'Can not create product'], 500);
+            return apiError(ApiStatus::SERVER_ERROR, 'Can not create product');
         }
     }
 
@@ -80,8 +78,8 @@ class ProductController extends Controller
         $product = $this->_productRepo->getDetailProduct($id);
 
         return ! $product
-            ? response()->json(['message' => 'ERROR'], 404)
-            : response()->json(['message' => 'SUCCESS', 'data' => $product]);
+            ? apiError(ApiStatus::NOT_FOUND, 'Url not found')
+            : apiSuccess($product, 'oke');
     }
 
     /**
@@ -96,21 +94,17 @@ class ProductController extends Controller
         $validator = $this->_validateProductCreate($request->all());
 
         if ($validator->fails()) {
-            return response()->json(['message' => 'ERROR', 'data' => $validator->getMessageBag()], 403);
+            return apiError(ApiStatus::VALIDATE_ERROR, $validator->getMessageBag());
         }
 
         try {
             $this->_productRepo->update($request->all(), $id);
 
-            return response()->json([
-                'message' => 'SUCCESS',
-                'data' => sprintf('Product id: %s was update successfully!', $id)
-            ], 201);
-
+            return apiSuccess([], sprintf('Product id: %s was update successfully!', $id));
         } catch (\Exception $e) {
             logger($e->getMessage());
 
-            return response()->json(['message' => 'ERROR', 'data' => "can not update product"], 500);
+            return apiError(ApiStatus::SERVER_ERROR, 'Can not update product');
         }
     }
 
@@ -126,20 +120,17 @@ class ProductController extends Controller
             $productExist = $this->_productRepo->destroy($id);
 
             if ( ! $productExist) {
-                return response()->json(['message' => 'ERROR', 'data' => "not found product"], 404);
+                return apiError(ApiStatus::NOT_FOUND, 'not found product');
             }
 
             $productExist->delete();
 
-            return response()->json([
-                'message' => 'SUCCESS',
-                'data' => sprintf('Product id: %s was delete successfully!', $id)
-            ], 201);
+            return apiSuccess([], sprintf('Product id: %s was delete successfully!', $id));
 
         } catch (\Exception $e) {
             logger($e->getMessage());
 
-            return response()->json(['message' => 'ERROR', 'data' => "can not delete product"], 500);
+            return apiError(ApiStatus::SERVER_ERROR, 'Can not delete product');
         }
     }
 }
