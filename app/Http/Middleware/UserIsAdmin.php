@@ -22,7 +22,7 @@ class UserIsAdmin
      */
     public function handle(Request $request, Closure $next)
     {
-        if ( ! $this->userHasRoleCEO()) {
+        if ( ! $this->isUserHasRoleCEO()) {
             return apiError(ApiStatus::CREDENTIAL_ERROR, 'Unauthorized!');
         }
 
