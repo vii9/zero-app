@@ -33,4 +33,11 @@ class UserApiRepository implements UserApiRepositoryInterface
     {
         return $this->_userModel->whereEmail($email)->first();
     }
+
+    public function getUsersByRole($role_name)
+    {
+        return $this->_userModel->whereHas('roles', function ($query) use ($role_name) {
+            $query->where('roles.name_column', '=', $role_name);
+        })->select('email', 'id')->get();
+    }
 }
