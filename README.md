@@ -23,7 +23,7 @@ PHP_FPM_INSTALL_EXIF=true
 #End Mail Config
 
 # // Queue
-    $   php artisan queue:work --stop-when-empty
+    $   php artisan queue:work --tries=3 --stop-when-empty
 # // Task Schedule
     $   php artisan schedule:work
 ```
