@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+#use App\Events\ProductUpdateEvent;
 use App\Constant\ApiStatus;
 use App\Http\Controllers\Controller;
 use App\Repositories\ProductApiRepositoryInterface;
@@ -57,7 +58,7 @@ class ProductController extends Controller
         DB::beginTransaction();
         try {
             $newProduct = $this->_productRepo->create($request->all());
-
+            #ProductUpdateEvent::dispatch($newProduct);
             $userEditor = $this->_userRepo->getUsersByRole(RoleConstant::IS_EDITOR);
             Notification::send($userEditor, new SentEmailToEditorNotification($newProduct));
             DB::commit();
