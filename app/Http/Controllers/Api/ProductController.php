@@ -7,15 +7,24 @@ use App\Http\Controllers\Controller;
 use App\Repositories\ProductApiRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Constant\RoleConstant;
+use App\Repositories\UserApiRepositoryInterface;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\SentEmailToEditorNotification;
 
 
 class ProductController extends Controller
 {
     private $_productRepo;
+    private $_userRepo;
 
-    public function __construct(ProductApiRepositoryInterface $productRepository)
-    {
+    public function __construct(
+        ProductApiRepositoryInterface $productRepository,
+        UserApiRepositoryInterface $userRepository
+    ) {
         $this->_productRepo = $productRepository;
+        $this->_userRepo = $userRepository;
     }
 
     /**
@@ -45,13 +54,18 @@ class ProductController extends Controller
         if ($validator->fails()) {
             return apiError(ApiStatus::VALIDATE_ERROR, $validator->getMessageBag());
         }
-
+        DB::beginTransaction();
         try {
             $newProduct = $this->_productRepo->create($request->all());
+
+            $userEditor = $this->_userRepo->getUsersByRole(RoleConstant::IS_EDITOR);
+            Notification::send($userEditor, new SentEmailToEditorNotification($newProduct));
+            DB::commit();
 
             return apiSuccess($newProduct,'Product create successfully',201);
         } catch (\Exception $e) {
             logger($e->getMessage());
+            DB::rollback();
 
             return apiError(ApiStatus::SERVER_ERROR, 'Can not create product');
         }

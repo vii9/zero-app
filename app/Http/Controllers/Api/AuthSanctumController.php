@@ -144,9 +144,9 @@ class AuthSanctumController extends Controller
     public function profile()
     {
         return apiSuccess([
-            'is_admin' => $this->userHasRoleCEO(),
-            'is_editor' => $this->userHasRoleEditor(),
-            'is_author' => $this->userHasRoleAuthor(),
+            'is_admin' => $this->isUserHasRoleCEO(),
+            'is_editor' => $this->isUserHasRoleEditor(),
+            'is_author' => $this->isUserHasRoleAuthor(),
         ]);
     }
 }

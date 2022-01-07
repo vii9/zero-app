@@ -20,7 +20,7 @@ class UserIsAuthor
      */
     public function handle(Request $request, Closure $next)
     {
-        if ( ! $this->userHasRoleAuthor()) {
+        if ( ! $this->isUserHasRoleAuthor()) {
             return apiError(ApiStatus::CREDENTIAL_ERROR, 'Unauthorized!');
         }
 

@@ -22,7 +22,7 @@ class userIsEditor
      */
     public function handle(Request $request, Closure $next)
     {
-        if ( ! $this->userHasRoleEditor()) {
+        if ( ! $this->isUserHasRoleEditor()) {
             return apiError(ApiStatus::CREDENTIAL_ERROR, 'Unauthorized!');
         }
 

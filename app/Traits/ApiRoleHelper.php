@@ -6,17 +6,17 @@ use App\Factory\RoleFactory;
 
 trait ApiRoleHelper {
 
-    protected function userHasRoleCEO()
+    protected function isUserHasRoleCEO()
     {
         return RoleFactory::checkRoleOfUser(RoleConstant::IS_CEO);
     }
 
-    protected function userHasRoleEditor()
+    protected function isUserHasRoleEditor()
     {
         return RoleFactory::checkRoleOfUser(RoleConstant::IS_EDITOR);
     }
 
-    protected function userHasRoleAuthor()
+    protected function isUserHasRoleAuthor()
     {
         return RoleFactory::checkRoleOfUser(RoleConstant::IS_AUTHOR);
     }
